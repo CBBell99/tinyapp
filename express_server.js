@@ -57,14 +57,14 @@ app.post('/urls', (req, res) => {
 app.get('/urls/:shortURL/edit', (req, res) => {
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = req.body.updatedURL
-  res.redirect(`/urls/${shortURL}`)
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.post('/urls/:shortURL/update', (req, res) => {
 
   const shortURL = req.params.shortURL;
   const updatedURL = req.body.updatedURL;
-  urlDatabase[shortURL] = updatedURL
+  urlDatabase[shortURL] = updatedURL;
   res.redirect('/urls');
 });
 // app.get('/example/:apple/:orange', (req, res) => {
@@ -77,8 +77,8 @@ app.post('/urls/:shortURL/update', (req, res) => {
 
 //deletes URL, redirects to URL index
 app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL]
-  res.redirect('/urls')
+  delete urlDatabase[req.params.shortURL];
+  res.redirect('/urls');
 });
 
 //new url
