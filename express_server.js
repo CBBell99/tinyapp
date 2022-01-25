@@ -53,6 +53,13 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+
+//deletes URL, redirects to URL index
+app.post('/urls/:shortURL/delete', (req, res) => {
+  delete urlDatabase[req.params.shortURL]
+  res.redirect('/urls')
+});
+
 //new url
 app.get('/urls/new', (req, res) => {
   res.render('urls_new');
