@@ -8,8 +8,8 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-
-function generateRandomString() {
+//generates random 6 character string to act as a URL
+const generateRandomString = () => {
   const characters = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const length = characters.length;
   let result = '';
@@ -50,8 +50,7 @@ app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`)
-  // console.log(urlDatabase)
+  res.redirect(`/urls/${shortURL}`);
 });
 
 //new url
@@ -66,7 +65,7 @@ app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[shortURL];
 
   res.redirect(longURL);
-})
+});
 
 app.get('/urls/:shortURL', (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
