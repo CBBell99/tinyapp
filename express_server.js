@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 
-
 app.set('view engine', 'ejs');
 
 const bodyParser = require('body-parser');
@@ -22,16 +21,17 @@ const generateRandomString = () => {
   return result;
 };
 
+//Global Variables
 const users = {
-  'userRandomID': {
-    id: 'userRandomId',
-    email: 'user@example.com',
-    password: 'purple-monkey-dinosaur'
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
   },
-  'user2RandomID': {
-    id: 'user2RandomID',
-    email: 'user2@example.com',
-    password: 'dishwasher-funk',
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
   }
 }
 
@@ -43,6 +43,7 @@ const urlDatabase = {
 app.get('/', (req, res) => {
   res.send('Hello');
 });
+
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
@@ -65,15 +66,6 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-//GET registration 
-app.get('/register', (req, res) => {
-  let templateVars = { username: req.cookies['username'] };
-  res.render('urls_register', templateVars);
-});
-
-app.post('register', (req, res) => {
-
-});
 
 
 // get edit route
@@ -102,11 +94,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-//new url
-app.get('/urls/new', (req, res) => {
-  const templateVars = { username: req.cookies['username'] };
-  res.render('urls_new', templateVars);
-});
 
 
 // short url
@@ -122,16 +109,41 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-// Login/logout route
+
+//GET registration 
+app.get('/register', (req, res) => {
+  let templateVars = { username: req.cookies['username'] };
+  res.render('urls_register', templateVars);
+});
+
+app.post('/register', (req, res) => {
+  const userID = generateRandomString();
+  users[userID] = {
+    id: userID,
+    email: req.body.email,
+    password: req.body.password
+  };
+  res.cookie('user_id', userID);
+  res.redirect('/urls');
+});
+
+
 
 app.post('/logout', (req, res) => {
   res.clearCookie("username");
   res.redirect('/urls');
 });
 
-
 app.post('/login', (req, res) => {
   res.cookie('username', req.body.username);
   res.redirect('/urls');
+});
+//new url
+app.get('/urls/new', (req, res) => {
+  const templateVars = { username: req.cookies['username'] };
+  res.render('urls_new', templateVars);
+});
 
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
 });
