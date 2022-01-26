@@ -42,7 +42,6 @@ const urlDatabase = {
 
 const verifyEmail = function(email, password) {
   for (let id in users) {
-    console.log(users)
     if (users[id].email === email && users[id].password === password) {
       return users[id];
     }
@@ -160,9 +159,14 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
+app.get('/login', (req, res) => {
+  let templateVars = { user: users[req.cookies['user_id']] }
+  res.render('urls_login', templateVars)
+});
+
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+  res.cookie('user_id', req.body.username);
+  res.redirect('/urls_login');
 });
 //new url
 app.get('/urls/new', (req, res) => {
