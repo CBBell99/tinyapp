@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+//Global Variables
 //generates random 6 character string to act as a URL
 const generateRandomString = () => {
   const characters = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -20,8 +21,7 @@ const generateRandomString = () => {
   }
   return result;
 };
-
-//Global Variables
+// users object
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -40,6 +40,19 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.com'
 };
 
+const verifyEmail = function(email, password) {
+  for (let id in users) {
+    console.log(users)
+    if (users[id].email === email && users[id].password === password) {
+      return users[id];
+    }
+  }
+  return false
+};
+
+verifyEmail('user2@example.com')
+
+// Routing
 app.get('/', (req, res) => {
   res.send('Hello');
 });
@@ -117,15 +130,28 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  const userID = generateRandomString();
-  users[userID] = {
-    id: userID,
-    email: req.body.email,
-    password: req.body.password
-  };
-  res.cookie('user_id', userID);
-  res.redirect('/urls');
+  let email = req.body.email;
+  let password = req.body.password;
+  if (email && password) {
+    if (!verifyEmail(email)) {
+      const userID = generateRandomString();
+      users[userID] = {
+        id: userID,
+        email: req.body.email,
+        password: req.body.password
+      }
+      res.cookie('user_id', userID);
+      res.redirect('/urls');
+    } else {
+      res.statusCode = 400;
+      res.render('400 Bad Request Email already registered')
+    }
+  } else {
+    res.statusCode = 400;
+    res.send('400 Bad Request Input an email and password')
+  }
 });
+
 
 
 
