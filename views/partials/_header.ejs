@@ -14,9 +14,9 @@
     <%if(!user) {%>
       <div>
         <form class="form-inline " action="/login" method="POST">
-          <span>
-            <input class="form-control" placeholder="Username" type="text" name="username" id="" />
-          </span>
+
+          <!-- <input class="form-control" placeholder="Username" type="text" name="username" id="" /> -->
+          <button type="submit" action="/register" class="btn btn-outline-light">Register</button>
           <button type="submit" class='btn btn-outline-dark ml-2'>Login</button>
         </form>
       </div>
