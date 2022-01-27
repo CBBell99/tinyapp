@@ -40,16 +40,16 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.com'
 };
 
-const verifyEmail = function(email, password) {
-  for (let id in users) {
-    if (users[id].email === email && users[id].password === password) {
-      return users[id];
+const verifyEmail = function(email, usersObj) {
+  for (let id in usersObj) {
+    if (usersObj[id].email === email) {
+      return usersObj[id];
     }
   }
   return false
 };
 
-verifyEmail('user2@example.com')
+// verifyEmail('user2@example.com')
 
 // Routing
 app.get('/', (req, res) => {
@@ -130,9 +130,9 @@ app.get('/register', (req, res) => {
 
 app.post('/register', (req, res) => {
   let email = req.body.email;
-  let password = req.body.password;
-  if (email && password) {
-    if (!verifyEmail(email)) {
+
+  if (email) {
+    if (!verifyEmail(email, users)) {
       const userID = generateRandomString();
       users[userID] = {
         id: userID,
@@ -147,12 +147,9 @@ app.post('/register', (req, res) => {
     }
   } else {
     res.statusCode = 400;
-    res.send('400 Bad Request Input an email and password')
+    res.render('400 Bad Request Input an email and password')
   }
 });
-
-
-
 
 app.post('/logout', (req, res) => {
   res.clearCookie("username");
@@ -165,8 +162,20 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  res.cookie('user_id', req.body.username);
-  res.redirect('/urls_login');
+  let email = req.body.email;
+  const user = verifyEmail(email, users);
+  if (user) {
+    if (req.body.password === user.password) {
+      res.cookie('user_id', user.userID)
+      res.redirect('/urls');
+    } else {
+      res.statusCode = 403;
+      res.render('403')
+    }
+  } else {
+    res.statusCode = 403;
+    res.render('403')
+  }
 });
 //new url
 app.get('/urls/new', (req, res) => {
