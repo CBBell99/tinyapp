@@ -40,16 +40,14 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.com'
 };
 
-const verifyEmail = function(email, usersObj) {
-  for (let id in usersObj) {
-    if (usersObj[id].email === email) {
-      return usersObj[id];
+const verifyEmail = function(email, usersDB) {
+  for (let id in usersDB) {
+    if (usersDB[id].email === email) {
+      return usersDB[id];
     }
   }
-  return false
+  return false;
 };
-
-// verifyEmail('user2@example.com')
 
 // Routing
 app.get('/', (req, res) => {
@@ -65,6 +63,7 @@ app.get('/hello', (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+// urls index
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] };
   res.render('urls_index', templateVars);
@@ -78,6 +77,11 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+//new url      //comebackto this
+app.get('/urls/new', (req, res) => {
+  const templateVars = { user: req.cookies['user_id'] };
+  res.render('urls_new', templateVars);
+});
 
 
 // get edit route
@@ -112,7 +116,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-
   res.redirect(longURL);
 });
 
@@ -130,12 +133,11 @@ app.get('/register', (req, res) => {
 
 app.post('/register', (req, res) => {
   let email = req.body.email;
-
   if (email) {
     if (!verifyEmail(email, users)) {
       const userID = generateRandomString();
       users[userID] = {
-        id: userID,
+        userID,
         email: req.body.email,
         password: req.body.password
       }
@@ -143,24 +145,25 @@ app.post('/register', (req, res) => {
       res.redirect('/urls');
     } else {
       res.statusCode = 400;
-      res.render('400 Bad Request Email already registered')
+      res.send('<p>400 Bad Request Email already registered</p>')
     }
   } else {
     res.statusCode = 400;
-    res.render('400 Bad Request Input an email and password')
+    res.render('<p>400 Bad Request Input an email and password</p>')
   }
 });
 
+//logout
 app.post('/logout', (req, res) => {
   res.clearCookie("user_id");
   res.redirect('/urls');
 });
-
+//login
 app.get('/login', (req, res) => {
   let templateVars = { user: users[req.cookies['user_id']] }
   res.render('urls_login', templateVars)
 });
-
+//login logic
 app.post('/login', (req, res) => {
   let email = req.body.email;
   const user = verifyEmail(email, users);
@@ -174,13 +177,8 @@ app.post('/login', (req, res) => {
     }
   } else {
     res.statusCode = 403;
-    res.render('403')
+    res.render('403');
   }
-});
-//new url
-app.get('/urls/new', (req, res) => {
-  const templateVars = { username: req.cookies['user_id'] };
-  res.render('urls_new', templateVars);
 });
 
 app.listen(PORT, () => {
