@@ -173,11 +173,11 @@ app.post('/login', (req, res) => {
       res.redirect('/urls');
     } else {
       res.statusCode = 403;
-      res.render('403')
+      res.send('<p>403 Bad password</p>')
     }
   } else {
     res.statusCode = 403;
-    res.render('403');
+    res.render('403 Email not registered');
   }
 });
 
