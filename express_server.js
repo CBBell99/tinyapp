@@ -79,8 +79,12 @@ app.post('/urls', (req, res) => {
 
 //new url      //comebackto this
 app.get('/urls/new', (req, res) => {
-  const templateVars = { user: req.cookies['user_id'] };
-  res.render('urls_new', templateVars);
+  if (req.cookies['user_id']) {
+    const templateVars = { user: req.cookies['user_id'] };
+    res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/login')
+  }
 });
 
 
@@ -156,7 +160,7 @@ app.post('/register', (req, res) => {
 //logout
 app.post('/logout', (req, res) => {
   res.clearCookie("user_id");
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 //login
 app.get('/login', (req, res) => {
@@ -177,7 +181,7 @@ app.post('/login', (req, res) => {
     }
   } else {
     res.statusCode = 403;
-    res.render('403 Email not registered');
+    res.send('<p>403 Email not registered</p>');
   }
 });
 
