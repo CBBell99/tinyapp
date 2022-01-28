@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+const bcrypt = require('bcryptjs')
 
 app.set("view engine", "ejs");
 
@@ -15,11 +16,11 @@ const urlDatabase = {
 
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
-    userID: "randomId"
+    userID: "randomID"
   },
   s2m5xK: {
     longURL: "http://www.google.com",
-    userID: "randomId"
+    userID: "randomID"
   }
 
 };
@@ -28,7 +29,7 @@ const users = {
   'randomId': {
     id: 'randomID',
     email: "a@b.com",
-    password: "1234"
+    password: bcrypt.hashSync("1234")
   },
 
 }
@@ -102,7 +103,7 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
   const userID = req.cookies['user_id'];
   const userURLs = urlsForUser(userID)
-  const templateVars = { shortURL: req.params.shortURL, user: users[userID] };
+  const templateVars = { urls: userURLs, user: users[userID], shortURL: req.params.shortURL };
   res.render('urls_show', templateVars);
 });
 
@@ -143,13 +144,14 @@ app.get('/register', (req, res) => {
 })
 //register logic
 app.post('/register', (req, res) => {
+
   if (req.body.email && req.body.password) {
     if (!verifyUserEmailinDatabase(req.body.email, users)) {
       const userID = generateRandomString();
       users[userID] = {
         userID,
         email: req.body.email,
-        password: req.body.password
+        password: bcrypt.hashSync(req.body.password)
       }
       res.cookie('user_id', userID);
       res.redirect('/urls');
@@ -161,6 +163,7 @@ app.post('/register', (req, res) => {
     res.statusCode = 400;
     res.send('400 Please enter in all fields')
   }
+  console.log(req.params)
 });
 
 // login page
@@ -173,7 +176,7 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const user = verifyUserEmailinDatabase(req.body.email, users)
   if (user) {
-    if (req.body.password === user.password) {
+    if (bcrypt.compareSync(req.body.password, user.password)) {
       res.cookie('user_id', user.userID);
       res.redirect('/urls');
     } else if (req.body.password !== user.password) {
