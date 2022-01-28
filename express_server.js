@@ -35,8 +35,12 @@ const users = {};
 //   },
 // }
 
-//Global Functions
+//Global Functions///////////////////////////
 //generates random 6 character string to act as a URL
+const { getUserByEmail } = require('./helpers')
+//const { urlsForUser } = require('./helpers')
+
+
 const generateRandomString = () => {
   const characters = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const length = characters.length;
@@ -46,16 +50,6 @@ const generateRandomString = () => {
   }
   return result;
 };
-
-//verifies if email is in database
-const verifyUserEmailinDatabase = (email, database) => {
-  for (const user in users) {
-    if (database[user].email === email) {
-      return database[user];
-    }
-  }
-  return undefined
-}
 
 //returns the URLs where the userID is equal to the current id
 const urlsForUser = (id) => {
@@ -154,7 +148,7 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
 
   if (req.body.email && req.body.password) {
-    if (!verifyUserEmailinDatabase(req.body.email, users)) {
+    if (!getUserByEmail(req.body.email, users)) {
       const userID = generateRandomString();
       users[userID] = {
         userID,
@@ -181,7 +175,7 @@ app.get('/login', (req, res) => {
 
 // login logic
 app.post('/login', (req, res) => {
-  const user = verifyUserEmailinDatabase(req.body.email, users)
+  const user = getUserByEmail(req.body.email, users)
   if (user) {
     if (bcrypt.compareSync(req.body.password, user.password)) {
       req.session.user_id = user.userID;
@@ -200,7 +194,7 @@ app.post('/login', (req, res) => {
 app.post('/logout', (req, res) => {
   res.clearCookie('session');
   res.clearCookie('session.sig');
-  res.redirect('/urls');
+  res.redirect('/login');
 })
 
 // server listen
