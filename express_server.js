@@ -1,3 +1,6 @@
+
+
+
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -28,10 +31,9 @@ const { urlsForUser, getUserByEmail, generateRandomString } = require('./helpers
 
 app.get('/', (req, res) => {
   if (req.session.user_id) {
-    res.redirect('/urls');
-  } else {
-    res.redirect('/login');
+    return res.redirect('/urls');
   }
+  res.redirect('/login');
 });
 
 // urls index page
@@ -59,10 +61,9 @@ app.post('/urls', (req, res) => {
 app.get('/urls/new', (req, res) => {
   if (req.session['user_id']) {
     let templateVars = { user: users[req.session['user_id']] };
-    res.render('urls_new', templateVars);
-  } else {
-    res.redirect('/login');
+    return res.render('urls_new', templateVars);
   }
+  res.redirect('/login');
 });
 
 // show both short and long urls
@@ -91,7 +92,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-// redirection to real website
+// redirection to real website or error page if it doesn't exist
 app.get('/u/:shortURL', (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     return res.redirect(urlDatabase[req.params.shortURL].longURL);
@@ -101,21 +102,23 @@ app.get('/u/:shortURL', (req, res) => {
 
 });
 
-//register
+//registeration page
 app.get('/register', (req, res) => {
   const templateVars = { user: users[req.session['user_id']] };
   res.render('urls_register', templateVars);
 });
-//register logic
+//register 
+//adds user to database. If account is already in db or don't fill out all fields, an error page will display
 app.post('/register', (req, res) => {
-
-  if (req.body.email && req.body.password) {
+  const email = req.body.email;
+  const password = req.body.password;
+  if (email && password) {
     if (!getUserByEmail(req.body.email, users)) {
       const userID = generateRandomString();
       users[userID] = {
         userID,
-        email: req.body.email,
-        password: bcrypt.hashSync(req.body.password)
+        email: email,
+        password: bcrypt.hashSync(password)
       };
       req.session.user_id = userID;
       res.redirect('/urls');
@@ -135,7 +138,7 @@ app.get('/login', (req, res) => {
   res.render('urls_login', templateVars);
 });
 
-// login logic
+// login logic. compares passwords to hashed passwords. Will display error if not registered or give the wrong password
 app.post('/login', (req, res) => {
   const user = getUserByEmail(req.body.email, users);
   if (user) {
@@ -148,11 +151,11 @@ app.post('/login', (req, res) => {
     }
   } else {
     res.statusCode = 403;
-    res.send('<p>403 User is not registered</p>');
+    res.send('<p>403 User is not registered <a href="/register">Sign up Here</a></p>');
   }
 });
 
-// logout clear cookies
+// logout clear session cookies
 app.post('/logout', (req, res) => {
   res.clearCookie('session');
   res.clearCookie('session.sig');
