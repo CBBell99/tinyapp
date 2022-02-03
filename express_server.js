@@ -70,7 +70,7 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
   const userID = req.session['user_id'];
   const userURLs = urlsForUser(userID, urlDatabase);
-  const templateVars = { urls: userURLs, user: users[userID], shortURL: req.params.shortURL };
+  const templateVars = {  userURLs, user: users[userID], shortURL: req.params.shortURL };
   res.render('urls_show', templateVars);
 });
 
