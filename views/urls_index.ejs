@@ -28,27 +28,17 @@
           <tbody>
             <% for(let url in urls) { %>
               <tr>
-                <td>
-                  <%= url %>
+                <td><%= url %></td>
+                <td><%= urls[url].longURL %></td>
+                <td><a href="/urls/<%-url%>" class="btn btn-outline-primary">Edit</a></td>
+                <td><form method="POST" action="/urls/<%- url%>/delete"><button
+                      class="btn btn-outline-danger">Delete</button></form>
                 </td>
-                <td>
-                  <%= urls[url].longURL %>
-                </td>
-                <td>
-                  <a href="/urls/<%-url%>" class="btn btn-outline-primary">Edit</a>
-
-                </td>
-                <td>
-                  <form method="POST" action="/urls/<%- url%>/delete"><button
-                      class="btn btn-outline-danger">Delete</button>
-                  </form>
-                </td>
-              </tr>
-              <% } %>
+              </tr><% } %>
           </tbody>
         </table>
         <% } else { %>
-          You must be logged in to see your URLs
+          <h4 class="m-3">You must be logged in to see your URLs</h4>
           <% } %>
     </main>
     <!-- Bootstrap JS -->
