@@ -16,8 +16,8 @@ const getUserByEmail = (email, database) => {
       return database[user];
     }
   }
-  return undefined
-}
+  return undefined;
+};
 
 //returns the URLs where the userID is equal to the current id
 const urlsForUser = (id, urlDatabase) => {
@@ -30,4 +30,4 @@ const urlsForUser = (id, urlDatabase) => {
   return userUrls;
 };
 
-module.exports = { getUserByEmail, urlsForUser }
+module.exports = { getUserByEmail, generateRandomString, urlsForUser };
