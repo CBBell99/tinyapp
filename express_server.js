@@ -3,7 +3,7 @@
 
 const express = require("express");
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = process.env.PORT || 8080; // default port 8080
 const bcrypt = require('bcryptjs');
 
 app.set("view engine", "ejs");
@@ -30,7 +30,8 @@ const { urlsForUser, getUserByEmail, generateRandomString } = require('./helpers
 ///Routing/////
 
 app.get('/', (req, res) => {
-  if (req.session.user_id) {
+  const user_id = req.session.user_id
+  if (user_id) {
     return res.redirect('/urls');
   }
   res.redirect('/login');
@@ -59,8 +60,10 @@ app.post('/urls', (req, res) => {
 
 // create a new url page. redirects if not logged in
 app.get('/urls/new', (req, res) => {
-  if (req.session['user_id']) {
-    let templateVars = { user: users[req.session['user_id']] };
+  console.log(req.session)
+  const userID = req.session.user_id
+  if (userID) {
+    let templateVars = { user: users[userID] };
     return res.render('urls_new', templateVars);
   }
   res.redirect('/login');
@@ -70,7 +73,7 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
   const userID = req.session['user_id'];
   const userURLs = urlsForUser(userID, urlDatabase);
-  const templateVars = {  userURLs, user: users[userID], shortURL: req.params.shortURL };
+  const templateVars = { userURLs, user: users[userID], shortURL: req.params.shortURL };
   res.render('urls_show', templateVars);
 });
 
@@ -94,7 +97,9 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 // redirection to real website or error page if it doesn't exist
 app.get('/u/:shortURL', (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
+  console.log(req.params)
+  const shortURL = req.params.shortURL
+  if (urlDatabase[shortURL]) {
     return res.redirect(urlDatabase[req.params.shortURL].longURL);
   }
   res.statusCode = 404;
