@@ -2,6 +2,9 @@
   "name": "tinyapp",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": "15.14.0"
+  },
   "scripts": {
     "start": "nodemon -L express_server.js",
     "test": "./node_modules/mocha/bin/mocha"
